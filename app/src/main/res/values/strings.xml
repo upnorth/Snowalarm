@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Snow alarm</string>
     <string name="title_activity_main">Snow alarm</string>
-    <string name="no_geocoder_available">No Geocoder Available</string>
+
 </resources>

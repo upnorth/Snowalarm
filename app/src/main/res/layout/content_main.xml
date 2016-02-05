@@ -28,17 +28,37 @@
         android:layout_height="wrap_content"
         android:text="Get GPS Position"
         android:id="@+id/getPosition"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/appTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text=""
+        android:text="waiting for coordinates..."
         android:id="@+id/showPosition"
         android:textSize="20sp"
         android:layout_below="@+id/getPosition"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="27dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get snowfall"
+        android:id="@+id/getSnowfall"
+        android:layout_above="@+id/showSnow"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="23dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="waiting for data..."
+        android:id="@+id/showSnow"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="67dp" />
 </RelativeLayout>

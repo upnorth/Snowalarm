@@ -1,6 +1,7 @@
 package com.nordicskibums.karl.snowalarm;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -69,7 +71,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         Snowalarm();
     }
+    public void onSendNotificationsButtonClick(View view) {
+        NotificationEventReceiver.setupAlarm(getApplicationContext());
+    }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    // To prevent crash on resuming activity  : interaction with fragments allowed only after Fragments Resumed or in OnCreate
+    // http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        // handleIntent();
+    }
     // Main method
     protected void Snowalarm() {
 

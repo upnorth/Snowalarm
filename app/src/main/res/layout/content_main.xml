@@ -26,32 +26,22 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get GPS Position"
+        android:text="Get distance to Kittelfjäll"
+        android:onClick="onGetGPSClick"
         android:id="@+id/getPosition"
         android:layout_below="@+id/appTitle"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="35dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="waiting for coordinates..."
-        android:id="@+id/showPosition"
-        android:textSize="20sp"
-        android:layout_below="@+id/getPosition"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="27dp" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Get snowfall"
-        android:onClick="onSendNotificationsButtonClick"
+        android:onClick="onGetSnowClick"
         android:id="@+id/getSnowfall"
         android:layout_marginTop="90dp"
-        android:layout_below="@+id/showPosition"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/getPosition" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -61,6 +51,15 @@
         android:id="@+id/showSnow"
         android:layout_marginTop="31dp"
         android:layout_below="@+id/getSnowfall"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="distance to kittelfjäll"
+        android:id="@+id/dist"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

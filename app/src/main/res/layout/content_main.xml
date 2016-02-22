@@ -93,12 +93,9 @@
         android:text="Set Alarm"
         android:onClick="onSetAlarm"
         android:id="@+id/setAlarm"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="23dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginBottom="65dp" />
+        android:layout_marginTop="40dp"
+        android:layout_below="@+id/editTime"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -106,8 +103,8 @@
         android:text="Cancel Alarm"
         android:onClick="onCancelAlarm"
         android:id="@+id/cancelAlarm"
-        android:layout_alignBottom="@+id/setAlarm"
-        android:layout_toRightOf="@+id/dist"
-        android:layout_toEndOf="@+id/dist" />
+        android:layout_marginTop="22dp"
+        android:layout_below="@+id/setAlarm"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

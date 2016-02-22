@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
@@ -12,9 +13,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  {
@@ -109,8 +114,10 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     public void onGetSnowClick(View view) {
-        //String snowfall;
-        //showSnow.setText(snowfall);
+        String url = "http://www.skiinfo.se/vast-norge/voss-resort/snorapport.html";
+        String progress = "";
+        String result = "";
+        GetSnow snowfall = (GetSnow) new GetSnow().execute(url, progress, result);
     }
 
     @Override
@@ -126,6 +133,44 @@ public class MainActivity extends AppCompatActivity  {
         super.onResumeFragments();
         // handleIntent();
     }
-    // Main method
+    // Fetch snowfall for last 12 hours at given station
+    class GetSnow extends AsyncTask<String, String, String> {
 
+        String question;
+        @Override
+        protected String doInBackground(String... args) {
+
+                /*
+        Röldal
+
+GPS: 59.823430, 6.740173
+URL: http://www.skiinfo.se/vast-norge/roldal/skidort.html
+Snö 24h: //*[@id="conditions_content"]/div[2]/ul[1]/li[2]/div/ul/li[3]/div[2]/div/div
+#conditions_content > div.content > ul:nth-child(2) > li._report_content > div > ul > li.today > div.station.top > div > div
+Uppdaterat: //*[@id="snow_conditions"]/div[2]/div[1]/div/ul[1]/li[1]/strong
+
+Voss
+
+GPS: 60.612322, 6.473834
+URL: http://www.skiinfo.se/vast-norge/voss-resort/snorapport.html
+Snö 24h: //*[@id="conditions_content"]/div[2]/ul[1]/li[2]/div/ul/li[3]/div[2]/div/div
+Uppdaterat: //*[@id="snow_conditions"]/div[2]/div[1]/div/ul[1]/li[1]/strong
+        */
+
+            try {
+                Document document = Jsoup.connect("http://www.skiinfo.se/vast-norge/voss-resort/snorapport.html").get();
+                Elements elements = document.select("#conditions_content > div.content > div.snow_depth > ul:nth-child(1) > li.elevation.upper > div.white_pill.long");
+                if (!elements.isEmpty()) {
+                    question = String.valueOf(elements.first().text());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return question;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            showSnow.setText(result);
+        }
+    }
 }

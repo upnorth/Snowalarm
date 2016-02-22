@@ -13,6 +13,7 @@ import java.net.URL;
 class GetSnow extends AsyncTask<String, String, String> {
 
     HttpURLConnection urlConnection;
+    private String APIkey = "eb68145abe8d235f044202efa16cbcb0";
     String newSnow;
 
     @Override

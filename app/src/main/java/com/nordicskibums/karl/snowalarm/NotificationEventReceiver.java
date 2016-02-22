@@ -1,9 +1,5 @@
 package com.nordicskibums.karl.snowalarm;
 
-/**
- * Created by wmli115015 on 2016-02-08.
- */
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -30,7 +26,7 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
     public static void setupAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent alarmIntent = getStartPendingIntent(context);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+        alarmManager.setRepeating(AlarmManager.RTC,
                 getTriggerAt(new Date()),
                 NOTIFICATIONS_INTERVAL_IN_HOURS * AlarmManager.INTERVAL_HOUR,
                 alarmIntent);
@@ -66,6 +62,7 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
         String action = intent.getAction();
         Intent serviceIntent = null;
         if (ACTION_START_NOTIFICATION_SERVICE.equals(action)) {
+
             Log.i(getClass().getSimpleName(), "onReceive from alarm, starting notification service");
             serviceIntent = NotificationIntentService.createIntentStartNotificationService(context);
         } else if (ACTION_DELETE_NOTIFICATION.equals(action)) {

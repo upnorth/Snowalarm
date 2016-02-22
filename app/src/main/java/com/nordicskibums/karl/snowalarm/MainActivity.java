@@ -12,23 +12,36 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  {
-    // implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
+
     private Button getGPS;
     private TextView distance;
 
     private Button getSnow;
     private TextView showSnow;
 
+    private TextView time;
+    private Button getTime;
+
     Location userLastLocation;
+    Location destinationLocation;
+    CharSequence alarmTime;
+    int hours;
+    int minutes;
+
+    ArrayList<Resort> resorts;
 
     String destinationGPS;
     String destinationName;
     String destinationData;
     int maxDistance;
     int minSnow;
-    int alarmTime;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +56,46 @@ public class MainActivity extends AppCompatActivity  {
         getSnow = (Button) findViewById(R.id.getSnowfall);
         showSnow = (TextView) findViewById(R.id.showSnow);
 
-        NotificationEventReceiver.setupAlarm(getApplicationContext());
+        time = (TextView) findViewById(R.id.editTime);
+        getTime = (Button) findViewById(R.id.getTime);
+
         Snowalarm();
     }
+
+    protected void Snowalarm() {
+
+        /*float distance = userLastLocation.distanceTo(destinationLocation);
+        if (distance <= maxDistance){
+            addResort(id, name, destinationLocation);
+        }
+        */
+        /*
+        Att göra:
+
+        Hämta destinationers GPS och namn
+        Hämta nederbörd för aktuella destinationer med väder-API och jämför med minSnow
+        Räkna ut om någon destination har fått minSnow eller mer snö
+
+        Koppla allt till GUI
+
+        */
+    }
+
+    public void onSetTime(View view) {
+        alarmTime = time.getText();
+        Toast.makeText(MainActivity.this, alarmTime, Toast.LENGTH_SHORT).show();
+    }
+    public void onSetAlarm(View view){
+        NotificationEventReceiver.setupAlarm(getApplicationContext());
+    }
+    public void onCancelAlarm(View view){
+        NotificationEventReceiver.cancelAlarm(getApplicationContext());
+    }
+    public void addResort(int id, String name, double lo, double la) {
+        //Resort resort = new Resort(id, name, lo, la);
+        //resorts.add(resort);
+    }
+
     public void onGetGPSClick(View view) {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -55,7 +105,7 @@ public class MainActivity extends AppCompatActivity  {
         Location dest = new Location("");
         dest.setLatitude(65.256882);
         dest.setLongitude(15.487579);
-        distance.setText(Float.toString(Math.round(location.distanceTo(dest)/1000))+ " km");
+        distance.setText(Float.toString(Math.round(location.distanceTo(dest) / 1000)) + " km");
     }
 
     public void onGetSnowClick(View view) {
@@ -77,20 +127,5 @@ public class MainActivity extends AppCompatActivity  {
         // handleIntent();
     }
     // Main method
-    protected void Snowalarm() {
 
-
-        /*
-        Att göra:
-
-        Räkna ut aktuella destinationer med deviceGPS och maxDistance
-        Hämta destinationers GPS och namn
-        Hämta nederbörd för aktuella destinationer med väder-API och jämför med minSnow
-        Räkna ut om någon destination har fått minSnow eller mer snö
-        Sätt igång larm
-
-        Koppla allt till GUI
-
-        */
-    }
 }

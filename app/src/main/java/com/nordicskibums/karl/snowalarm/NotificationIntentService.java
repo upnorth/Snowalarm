@@ -1,8 +1,5 @@
 package com.nordicskibums.karl.snowalarm;
 
-/**
- * Created by wmli115015 on 2016-02-08.
- */
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,12 +8,8 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+import android.widget.Toast;
 
-/**
- * Created by klogi
- *
- *
- */
 public class NotificationIntentService extends IntentService {
 
     private static final int NOTIFICATION_ID = 1;
@@ -53,16 +46,16 @@ public class NotificationIntentService extends IntentService {
     }
 
     private void processDeleteNotification(Intent intent) {
-        // Log something?
+        Log.d(getClass().getSimpleName(), "Alarm notification event cancelled");
     }
 
     private void processStartNotification() {
         // Do something. For example, fetch fresh data from backend to create a rich notification?
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("Scheduled Notification")
+        builder.setContentTitle("Snow alarm:")
                 .setAutoCancel(true)
-                .setContentText("This notification has been triggered by Notification Service")
+                .setContentText("Get up and check out the new pow!")
                 .setSmallIcon(R.drawable.notification_icon);
 
         Intent mainIntent = new Intent(this, NotificationActivity.class);

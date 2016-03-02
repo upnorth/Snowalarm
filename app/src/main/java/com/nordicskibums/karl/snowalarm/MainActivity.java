@@ -1,17 +1,14 @@
 package com.nordicskibums.karl.snowalarm;
 
 import android.content.Context;
-import android.content.Intent;
-import android.location.Criteria;
+import android.content.SharedPreferences;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,34 +16,38 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity  {
 
-    private Button getGPS;
-    private TextView distance;
+    private TextView getMinSnow;
+    private TextView getMaxDistance;
+    private TextView getAlarmDate;
+    private TextView getAlarmTime;
+    private TextView setAlarm;
 
-    private Button getSnow;
-    private TextView showSnow;
+    Location userLocation;
+    InputStream allResortsCSV;
+    ArrayList<Resort> resortsToCheck;
 
-    private TextView time;
-    private Button getTime;
+    private String updatedURL;
+    private String newSnowURL;
+    private String snowPackURL;
+    
+    SharedPreferences.Editor editor;
 
-    Location userLastLocation;
-    Location destinationLocation;
-    CharSequence alarmTime;
-    int hours;
-    int minutes;
-
-    ArrayList<Resort> resorts;
-
-    String destinationGPS;
-    String destinationName;
-    String destinationData;
-    int maxDistance;
-    int minSnow;
-
+    int minSnow = 0;
+    int maxDist = 0;
+    int alarmDate = 0;
+    int alarmTime = 0;
+    Date alarmDateTime = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,122 +56,226 @@ public class MainActivity extends AppCompatActivity  {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getGPS = (Button) findViewById(R.id.getPosition);
-        distance = (TextView) findViewById(R.id.dist);
+        getMinSnow = (TextView) findViewById(R.id.editSnow);
+        getMaxDistance = (TextView) findViewById(R.id.editDist);
+        getAlarmDate = (TextView) findViewById(R.id.editDate);
+        getAlarmTime = (TextView) findViewById(R.id.editTime);
+        setAlarm = (TextView) findViewById(R.id.setAlarm); setAlarm.setEnabled(false);
 
-        getSnow = (Button) findViewById(R.id.getSnowfall);
-        showSnow = (TextView) findViewById(R.id.showSnow);
+        // XML Selectors for ...snorapport.html URLs
+        updatedURL = "#snow_conditions > div.sr_module_header_grad > div.sr_module_header > div > ul:nth-child(1) > li.left > strong";
+        newSnowURL = "#conditions_content > div.content > ul:nth-child(2) > li._report_content > div > ul > li.today > div.station.top > div > div";
+        snowPackURL = "#conditions_content > div.content > div.snow_depth > ul:nth-child(1) > li.elevation.upper > div.white_pill.long";
 
-        time = (TextView) findViewById(R.id.editTime);
-        getTime = (Button) findViewById(R.id.getTime);
+        // Get user position
+        UserLocation userLocation = new UserLocation();
+        this.userLocation = userLocation.latest(this);
 
-        Snowalarm();
     }
-
     protected void Snowalarm() {
 
-        /*float distance = userLastLocation.distanceTo(destinationLocation);
-        if (distance <= maxDistance){
-            addResort(id, name, destinationLocation);
-        }
-        */
+        // Get nearby resorts
+        resortsToCheck = findResorts(userLocation);
+
+        // Check snowfall at nearby resorts and trigger alarm if user conditions are met
+        new GetSnow().execute(resortsToCheck);
+
         /*
         Att göra:
 
-        Hämta destinationers GPS och namn
-        Hämta nederbörd för aktuella destinationer med väder-API och jämför med minSnow
-        Räkna ut om någon destination har fått minSnow eller mer snö
-
+        Hantering av CM och TUM för data om snö
+        Integrera logik i service
         Koppla allt till GUI
 
         */
     }
-
-    public void onSetTime(View view) {
-        alarmTime = time.getText();
-        Toast.makeText(MainActivity.this, alarmTime, Toast.LENGTH_SHORT).show();
+    public void onSetSnow(View view) {
+        if(getInt(getMinSnow) < 0){
+            Toast.makeText(MainActivity.this, "Are you kidding me!?", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            minSnow = getInt(getMinSnow);
+            editor = getPreferences(MODE_PRIVATE).edit();
+            editor.putInt("minSnow", getInt(getMinSnow));
+            editor.apply();
+            checkSettings();
+            Toast.makeText(MainActivity.this, Integer.toString(minSnow), Toast.LENGTH_SHORT).show();
+        }
     }
+    public void onSetDist(View view) {
+        if(getInt(getMaxDistance) < 0){
+            Toast.makeText(MainActivity.this, "Are you kidding me!?", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            maxDist = getInt(getMaxDistance);
+            editor = getPreferences(MODE_PRIVATE).edit();
+            editor.putInt("maxDistance", getInt(getMaxDistance));
+            editor.apply();
+            checkSettings();
+            Toast.makeText(MainActivity.this, Integer.toString(maxDist), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+    public void onSetDate(View view) {
+        if(getAlarmDate.getText().length() == 6){
+            alarmDate = getInt(getAlarmDate);
+            setDate();
+        }
+        else{
+            Toast.makeText(MainActivity.this, "Not a valid time, try again!", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void onSetTime(View view) {
+        if(getAlarmTime.getText().length() == 4){
+            alarmTime = getInt(getAlarmTime);
+            setDate();
+        }
+        else{
+            Toast.makeText(MainActivity.this, "Not a valid time, try again!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void setDate() {
+        if(alarmDate!=0 && alarmTime!=0){
+            try{
+                // Create datetime from input
+                SimpleDateFormat originalFormat = new SimpleDateFormat("yyMMddHHmm");
+                String timestamp = String.valueOf(alarmDate)+String.valueOf(alarmTime);
+                alarmDateTime = originalFormat.parse(timestamp);
+                // Store datetime as milliseconds in shared preferences
+                editor = getSharedPreferences(getSPName(this), MODE_PRIVATE).edit();
+                editor.putString("alarmDateTime", timestamp);
+                editor.apply();
+                // Test that correct date can be retrieved
+                SharedPreferences settings = getSharedPreferences(getSPName(this), MODE_PRIVATE);
+                SimpleDateFormat createDate = new SimpleDateFormat ("HH:mm, yyyy dd/MM");
+                timestamp = String.valueOf(settings.getString("alarmDateTime", ""));
+                alarmDateTime = originalFormat.parse(timestamp);
+                Toast.makeText(MainActivity.this, "Alarm time set to: "+alarmDateTime.toString(), Toast.LENGTH_SHORT).show();
+                checkSettings();
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Toast.makeText(MainActivity.this, "Wrong date or time format.\nExample: 160305 and 0730 required.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private static String getSPName(Context context) {
+        return context.getPackageName() + "_preferences";
+    }
+    private Integer getInt(TextView text){
+        if(!text.getText().equals("")){
+            return Integer.parseInt(text.getText().toString());
+        }
+        else {
+            Toast.makeText(MainActivity.this, "Not a valid value, try again!", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+    public void checkSettings(){
+        if(minSnow>-1 && maxDist>-1 && alarmDateTime!=null){
+            setAlarm.setEnabled(true);
+        }
+    }
+
     public void onSetAlarm(View view){
         NotificationEventReceiver.setupAlarm(getApplicationContext());
+        Snowalarm();
+        minSnow = 0;
+        maxDist = 0;
+        alarmDateTime = null;
+        getAlarmDate.setText("");
+        getAlarmTime.setText("");
+        getMaxDistance.setText("");
+        getMinSnow.setText("");
     }
     public void onCancelAlarm(View view){
         NotificationEventReceiver.cancelAlarm(getApplicationContext());
     }
-    public void addResort(int id, String name, double lo, double la) {
-        //Resort resort = new Resort(id, name, lo, la);
-        //resorts.add(resort);
-    }
 
-    public void onGetGPSClick(View view) {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
-        //Kittelfjäll 65.256882 N 15.487579 E
-        Location dest = new Location("");
-        dest.setLatitude(65.256882);
-        dest.setLongitude(15.487579);
-        distance.setText(Float.toString(Math.round(location.distanceTo(dest) / 1000)) + " km");
-    }
+    public ArrayList<Resort> findResorts(Location user){
+        allResortsCSV = this.getResources().openRawResource(R.raw.resorts);
+        ArrayList<Resort> resorts = new ArrayList<>();
+        BufferedReader fileReader = null;
+        final String DELIMITER = ";";
+        try
+        {
+            String line;
+            //Create the file reader
+            InputStreamReader resortsReader = new InputStreamReader(allResortsCSV);
+            BufferedReader br = new BufferedReader(resortsReader);
+            fileReader = new BufferedReader(br);
 
-    public void onGetSnowClick(View view) {
-        String url = "http://www.skiinfo.se/vast-norge/voss-resort/snorapport.html";
-        String progress = "";
-        String result = "";
-        GetSnow snowfall = (GetSnow) new GetSnow().execute(url, progress, result);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-    }
-
-    // To prevent crash on resuming activity  : interaction with fragments allowed only after Fragments Resumed or in OnCreate
-    // http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
-        // handleIntent();
-    }
-    // Fetch snowfall for last 12 hours at given station
-    class GetSnow extends AsyncTask<String, String, String> {
-
-        String question;
-        @Override
-        protected String doInBackground(String... args) {
-
-                /*
-        Röldal
-
-GPS: 59.823430, 6.740173
-URL: http://www.skiinfo.se/vast-norge/roldal/skidort.html
-Snö 24h: //*[@id="conditions_content"]/div[2]/ul[1]/li[2]/div/ul/li[3]/div[2]/div/div
-#conditions_content > div.content > ul:nth-child(2) > li._report_content > div > ul > li.today > div.station.top > div > div
-Uppdaterat: //*[@id="snow_conditions"]/div[2]/div[1]/div/ul[1]/li[1]/strong
-
-Voss
-
-GPS: 60.612322, 6.473834
-URL: http://www.skiinfo.se/vast-norge/voss-resort/snorapport.html
-Snö 24h: //*[@id="conditions_content"]/div[2]/ul[1]/li[2]/div/ul/li[3]/div[2]/div/div
-Uppdaterat: //*[@id="snow_conditions"]/div[2]/div[1]/div/ul[1]/li[1]/strong
-        */
-
+            //Read the file line by line
+            fileReader.readLine(); // Skip column names
+            while ((line = fileReader.readLine()) != null)
+            {
+                //Get all tokens available in line
+                String[] res = line.split(DELIMITER);
+                Location dest = new Location("");
+                dest.setLatitude(Double.parseDouble(res[3]));
+                dest.setLongitude(Double.parseDouble(res[4]));
+                int distance = Math.round(userLocation.distanceTo(dest) / 1000); // distance in Km
+                if (distance <= maxDist){
+                    Resort resort = new Resort(Integer.parseInt(res[0]),res[1],res[2],dest);
+                    resorts.add(resort);
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally
+        {
             try {
-                Document document = Jsoup.connect("http://www.skiinfo.se/vast-norge/voss-resort/snorapport.html").get();
-                Elements elements = document.select("#conditions_content > div.content > div.snow_depth > ul:nth-child(1) > li.elevation.upper > div.white_pill.long");
-                if (!elements.isEmpty()) {
-                    question = String.valueOf(elements.first().text());
+                fileReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return resorts;
+    }
+
+    // Fetch snowfall for last 12 hours at given station
+    class GetSnow extends AsyncTask<ArrayList<Resort>, Void, ArrayList<Resort>> {
+        @Override
+        protected ArrayList<Resort> doInBackground(ArrayList<Resort>... args) {
+            ArrayList<Resort> resorts = args[0];
+            Document document;
+            Elements elements;
+            try {
+                for(int i=0;i<resorts.size();i++){
+                    document = Jsoup.connect(resorts.get(i).getUrl()).get();
+                    elements = document.select(newSnowURL);
+                    if (!elements.isEmpty()) {
+                        resorts.get(i).setSnow24h(elements.first().text());
+                    }
+                    elements = document.select(updatedURL);
+                    if (!elements.isEmpty()) {
+                        resorts.get(i).setUpdated(elements.first().text());
+                    }
+                    elements = document.select(snowPackURL);
+                    if (!elements.isEmpty()) {
+                        resorts.get(i).setSnowPack(elements.first().text());
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return question;
+            return resorts;
         }
         @Override
-        protected void onPostExecute(String result) {
-            showSnow.setText(result);
+        protected void onPostExecute(ArrayList<Resort> result) {
+            // Check snowfall and trigger alarm
+            for(int i=0;i<result.size();i++){
+                String snow = result.get(i).getSnow24h();
+                snow = snow.substring(0,snow.length()-2);
+                if(Integer.parseInt(snow) > minSnow){
+                    Toast.makeText(MainActivity.this, "Get up! "+result.get(i).getName()+" has "+result.get(i).getSnow24h()+" fresh on a "+result.get(i).getSnowPack()+" snowpack!!\nUpdated:"+result.get(i).getUpdated(), Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(MainActivity.this, "Chill out", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 }

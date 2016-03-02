@@ -34,13 +34,6 @@
             android:exported="false" />
 
         <receiver android:name=".NotificationEventReceiver" />
-        <receiver android:name=".NotificationServiceStarterReciever">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
-                <action android:name="android.intent.action.TIME_SET" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

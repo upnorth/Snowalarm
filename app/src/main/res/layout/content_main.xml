@@ -16,53 +16,93 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Snow alarm\nby Nordic skibums"
-        android:id="@+id/appTitle"
-        android:textAlignment="center"
+        android:text="Set preferences:"
+        android:id="@+id/textView"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="distance to kittelfjäll"
-        android:id="@+id/dist"
-        android:layout_alignBottom="@+id/getPosition"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:text="Set min snowfall (cm)"
+        android:onClick="onSetSnow"
+        android:id="@+id/setSnow"
+        android:layout_marginTop="29dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignRight="@+id/setDist"
+        android:layout_alignEnd="@+id/setDist"
+        android:layout_alignLeft="@+id/setDist"
+        android:layout_alignStart="@+id/setDist" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set distance"
-        android:onClick="onGetGPSClick"
-        android:id="@+id/getPosition"
-        android:layout_below="@+id/appTitle"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="38dp" />
+        android:text="Set max distance (km)"
+        android:onClick="onSetDist"
+        android:id="@+id/setDist"
+        android:layout_below="@+id/editSnow"
+        android:layout_alignRight="@+id/setTime"
+        android:layout_alignEnd="@+id/setTime"
+        android:layout_alignLeft="@+id/setTime"
+        android:layout_alignStart="@+id/setTime" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get snowfall"
-        android:onClick="onGetSnowClick"
-        android:id="@+id/getSnowfall"
-        android:layout_alignTop="@+id/showSnow"
+        android:text="Set date (yymmdd)"
+        android:onClick="onSetDate"
+        android:id="@+id/setDate"
+        android:layout_below="@+id/setDist"
+        android:layout_alignRight="@+id/setDist"
+        android:layout_alignEnd="@+id/setDist"
+        android:layout_alignLeft="@+id/setTime"
+        android:layout_alignStart="@+id/setTime" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set alarm time (hhmm)"
+        android:onClick="onSetTime"
+        android:id="@+id/setTime"
+        android:layout_below="@+id/editDate"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="waiting for data..."
-        android:id="@+id/showSnow"
-        android:layout_below="@+id/dist"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/editSnow"
+        android:layout_alignBottom="@+id/setSnow"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="69dp" />
+        android:layout_toLeftOf="@+id/cancelAlarm"
+        android:layout_toStartOf="@+id/cancelAlarm" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/editDist"
+        android:layout_alignBottom="@+id/setDist"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/cancelAlarm"
+        android:layout_toStartOf="@+id/cancelAlarm" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="date"
+        android:ems="10"
+        android:id="@+id/editDate"
+        android:layout_alignBottom="@+id/setDate"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/cancelAlarm"
+        android:layout_toStartOf="@+id/cancelAlarm" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -70,7 +110,7 @@
         android:inputType="time"
         android:ems="10"
         android:id="@+id/editTime"
-        android:layout_alignBottom="@+id/getTime"
+        android:layout_alignBottom="@+id/setTime"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@+id/cancelAlarm"
@@ -79,22 +119,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set time"
-        android:onClick="onSetTime"
-        android:layout_marginTop="29dp"
-        android:id="@+id/getTime"
-        android:layout_below="@+id/getSnowfall"
-        android:layout_alignRight="@+id/getPosition"
-        android:layout_alignEnd="@+id/getPosition" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="Set Alarm"
         android:onClick="onSetAlarm"
         android:id="@+id/setAlarm"
-        android:layout_marginTop="40dp"
-        android:layout_below="@+id/editTime"
+        android:layout_above="@+id/cancelAlarm"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -103,8 +131,8 @@
         android:text="Cancel Alarm"
         android:onClick="onCancelAlarm"
         android:id="@+id/cancelAlarm"
-        android:layout_marginTop="22dp"
-        android:layout_below="@+id/setAlarm"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="57dp" />
 
 </RelativeLayout>

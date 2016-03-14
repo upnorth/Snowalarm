@@ -12,62 +12,6 @@
     tools:context="com.nordicskibums.karl.snowalarm.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Set preferences:"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set min snowfall (cm)"
-        android:onClick="onSetSnow"
-        android:id="@+id/setSnow"
-        android:layout_marginTop="29dp"
-        android:layout_below="@+id/textView"
-        android:layout_alignRight="@+id/setDist"
-        android:layout_alignEnd="@+id/setDist"
-        android:layout_alignLeft="@+id/setDist"
-        android:layout_alignStart="@+id/setDist" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set max distance (km)"
-        android:onClick="onSetDist"
-        android:id="@+id/setDist"
-        android:layout_below="@+id/editSnow"
-        android:layout_alignRight="@+id/setTime"
-        android:layout_alignEnd="@+id/setTime"
-        android:layout_alignLeft="@+id/setTime"
-        android:layout_alignStart="@+id/setTime" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set date (yyyymmdd)"
-        android:onClick="onSetDate"
-        android:id="@+id/setDate"
-        android:layout_below="@+id/setDist"
-        android:layout_alignRight="@+id/setDist"
-        android:layout_alignEnd="@+id/setDist"
-        android:layout_alignLeft="@+id/setTime"
-        android:layout_alignStart="@+id/setTime" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set alarm time (hhmm)"
-        android:onClick="onSetTime"
-        android:id="@+id/setTime"
-        android:layout_below="@+id/editDate"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -77,8 +21,19 @@
         android:layout_alignBottom="@+id/setSnow"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/cancelAlarm"
-        android:layout_toStartOf="@+id/cancelAlarm" />
+        android:layout_toStartOf="@+id/setDist"
+        android:layout_alignRight="@+id/editDist"
+        android:layout_alignEnd="@+id/editDist" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btnSnow"
+        android:onClick="onSetSnow"
+        android:id="@+id/setSnow"
+        android:layout_toRightOf="@+id/editSnow"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -89,10 +44,22 @@
         android:layout_alignBottom="@+id/setDist"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/cancelAlarm"
-        android:layout_toStartOf="@+id/cancelAlarm" />
+        android:layout_toStartOf="@+id/setTime"
+        android:layout_toLeftOf="@+id/setTime" />
 
-    <EditText
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btnDist"
+        android:onClick="onSetDist"
+        android:id="@+id/setDist"
+        android:layout_below="@+id/editSnow"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/editDist"
+        android:layout_toEndOf="@+id/editDist" />
+
+    <!--EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="date"
@@ -101,8 +68,20 @@
         android:layout_alignBottom="@+id/setDate"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/cancelAlarm"
-        android:layout_toStartOf="@+id/cancelAlarm" />
+        android:layout_toLeftOf="@+id/setDate"
+        android:layout_toStartOf="@+id/setDate" /-->
+
+    <!--Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set date (yyyymmdd)"
+        android:onClick="onSetDate"
+        android:id="@+id/setDate"
+        android:layout_below="@+id/setDist"
+        android:layout_alignRight="@+id/setDist"
+        android:layout_alignEnd="@+id/setDist"
+        android:layout_alignLeft="@+id/setTime"
+        android:layout_alignStart="@+id/setTime" /-->
 
     <EditText
         android:layout_width="wrap_content"
@@ -113,26 +92,45 @@
         android:layout_alignBottom="@+id/setTime"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/cancelAlarm"
-        android:layout_toLeftOf="@+id/cancelAlarm" />
+        android:layout_toLeftOf="@+id/setTime"
+        android:layout_toStartOf="@+id/setTime" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set Alarm"
+        android:text="@string/btnTime"
+        android:onClick="onSetTime"
+        android:id="@+id/setTime"
+        android:layout_below="@+id/editDist"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btnGPS"
+        android:onClick="onRefreshGPS"
+        android:id="@+id/updatePosition"
+        android:layout_below="@+id/editTime"
+        android:layout_alignRight="@+id/setTime"
+        android:layout_alignEnd="@+id/setTime" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btnSet"
         android:onClick="onSetAlarm"
         android:id="@+id/setAlarm"
-        android:layout_above="@+id/cancelAlarm"
+        android:layout_below="@+id/updatePosition"
         android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cancel Alarm"
+        android:text="@string/btnCancel"
         android:onClick="onCancelAlarm"
         android:id="@+id/cancelAlarm"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="57dp" />
+        android:layout_below="@+id/setAlarm"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

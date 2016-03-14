@@ -1,12 +1,19 @@
 package com.nordicskibums.karl.snowalarm;
 
-import android.content.SharedPreferences;
+/**
+ * Created by wmli115015 on 2016-02-08.
+ */
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class NotificationEventReceiver extends WakefulBroadcastReceiver {
 
@@ -16,26 +23,42 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
     private static final int NOTIFICATIONS_INTERVAL_IN_HOURS = 2;
 
     public static void setupAlarm(Context context) {
+
         //Create alarm manager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         //Create pending intent & register it to your alarm notifier class
         Intent intent = new Intent(context, NotificationEventReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        PendingIntent alarmIntent = getStartPendingIntent(context);
+        //PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         SharedPreferences settings = context.getSharedPreferences(getSPName(context), context.MODE_PRIVATE);
 
         long time = settings.getLong("alarmDateTime",0);
         //set that timer as a RTC Wakeup to alarm manager object
-        alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, time, alarmIntent);
+
+
+        /*alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                getTriggerAt(new Date()),
+                NOTIFICATIONS_INTERVAL_IN_HOURS * AlarmManager.INTERVAL_HOUR,
+                alarmIntent);*/
     }
     private static String getSPName(Context context) {
         return context.getPackageName() + "_preferences";
     }
+
     public static void cancelAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent alarmIntent = getStartPendingIntent(context);
         alarmManager.cancel(alarmIntent);
+    }
+
+    private static long getTriggerAt(Date now) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        //calendar.add(Calendar.HOUR, NOTIFICATIONS_INTERVAL_IN_HOURS);
+        return calendar.getTimeInMillis();
     }
 
     private static PendingIntent getStartPendingIntent(Context context) {

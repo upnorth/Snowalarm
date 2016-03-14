@@ -5,13 +5,19 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 
-public class UserLocation {
+import java.util.List;
 
-    public Location latest(Context context) {
+public class Position {
+
+    public Location device;
+    private Context context;
+
+    public Position(Context context) {
+        this.context = context;
         LocationManager locationManager = (android.location.LocationManager)
                 context.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        return locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+        device = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
     }
 }

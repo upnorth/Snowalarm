@@ -7,9 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
-import android.widget.Toast;
-
-import java.util.Date;
 
 public class NotificationEventReceiver extends WakefulBroadcastReceiver {
 
@@ -28,8 +25,7 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
 
         SharedPreferences settings = context.getSharedPreferences(getSPName(context), context.MODE_PRIVATE);
 
-        //set timer you want alarm to work (here I have set it to 7.20pm)
-        long time = settings.getLong("alarmTime",0);
+        long time = settings.getLong("alarmDateTime",0);
         //set that timer as a RTC Wakeup to alarm manager object
         alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
     }

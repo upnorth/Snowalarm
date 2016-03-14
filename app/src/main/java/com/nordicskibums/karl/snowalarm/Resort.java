@@ -11,11 +11,13 @@ public class Resort {
     private String snow24h;
     private String updated;
     private String snowPack;
+    private String format;
 
-    public Resort(int id, String name, String url, Location dest) {
+    public Resort(int id, String name, String url, String format, Location dest) {
         this.id = id;
         this.name = name;
         this.url = url;
+        this.format = format;
         this.position = dest;
     }
 
@@ -36,4 +38,7 @@ public class Resort {
 
     public String getSnowPack() { return snowPack; }
     public void setSnowPack(String snowPack) { this.snowPack = snowPack; }
+
+    public String getFormat() { return format; }
+    public void setFormat(String format) { this.format = format; }
 }

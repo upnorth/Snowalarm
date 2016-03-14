@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
-import android.widget.Toast;
 
 public class NotificationIntentService extends IntentService {
 
@@ -43,10 +42,6 @@ public class NotificationIntentService extends IntentService {
         } finally {
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }
-    }
-
-    private void processDeleteNotification(Intent intent) {
-        Log.d(getClass().getSimpleName(), "Alarm notification event cancelled");
     }
 
     private void processStartNotification() {

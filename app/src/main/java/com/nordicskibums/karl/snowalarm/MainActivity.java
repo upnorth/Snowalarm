@@ -3,6 +3,7 @@ package com.nordicskibums.karl.snowalarm;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -24,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -45,8 +47,8 @@ public class MainActivity extends AppCompatActivity  {
 
     int minSnow = 0;
     int maxDist = 0;
-    int alarmDate = 0;
-    int alarmTime = 0;
+    String alarmDate = "";
+    String alarmTime = "";
     Date alarmDateTime = null;
 
     @Override
@@ -62,15 +64,41 @@ public class MainActivity extends AppCompatActivity  {
         getAlarmTime = (TextView) findViewById(R.id.editTime);
         setAlarm = (TextView) findViewById(R.id.setAlarm); setAlarm.setEnabled(false);
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String currentDate = sdf.format(new Date());
+        getAlarmDate.setText(currentDate);
+        getAlarmTime.setText("0700");
+
         // XML Selectors for ...snorapport.html URLs
         updatedURL = "#snow_conditions > div.sr_module_header_grad > div.sr_module_header > div > ul:nth-child(1) > li.left > strong";
         newSnowURL = "#conditions_content > div.content > ul:nth-child(2) > li._report_content > div > ul > li.today > div.station.top > div > div";
         snowPackURL = "#conditions_content > div.content > div.snow_depth > ul:nth-child(1) > li.elevation.upper > div.white_pill.long";
 
         // Get user position
-        UserLocation userLocation = new UserLocation();
-        this.userLocation = userLocation.latest(this);
-
+        Position pos = new Position(this);
+        userLocation = pos.device;
+        if(userLocation == null){
+            userLocation = getLastKnownLocation();
+            if(userLocation == null){
+                Toast.makeText(MainActivity.this, "Please activate GPS, Snow alarm can´t find where you are!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private Location getLastKnownLocation() {
+        LocationManager mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
     }
     protected void Snowalarm() {
 
@@ -117,8 +145,8 @@ public class MainActivity extends AppCompatActivity  {
 
     }
     public void onSetDate(View view) {
-        if(getAlarmDate.getText().length() == 6){
-            alarmDate = getInt(getAlarmDate);
+        if(getAlarmDate.getText().length() == 8){
+            alarmDate = getAlarmDate.getText().toString();
             setDate();
         }
         else{
@@ -127,7 +155,7 @@ public class MainActivity extends AppCompatActivity  {
     }
     public void onSetTime(View view) {
         if(getAlarmTime.getText().length() == 4){
-            alarmTime = getInt(getAlarmTime);
+            alarmTime = getAlarmTime.getText().toString();
             setDate();
         }
         else{
@@ -136,22 +164,25 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     private void setDate() {
-        if(alarmDate!=0 && alarmTime!=0){
+        if(alarmDate!="" && alarmTime!=""){
             try{
                 // Create datetime from input
-                SimpleDateFormat originalFormat = new SimpleDateFormat("yyMMddHHmm");
-                String timestamp = String.valueOf(alarmDate)+String.valueOf(alarmTime);
+                SimpleDateFormat originalFormat = new SimpleDateFormat("yyyyMMddHHmm");
+                String timestamp = alarmDate+alarmTime;
                 alarmDateTime = originalFormat.parse(timestamp);
+                long save = alarmDateTime.getTime();
+
                 // Store datetime as milliseconds in shared preferences
                 editor = getSharedPreferences(getSPName(this), MODE_PRIVATE).edit();
-                editor.putString("alarmDateTime", timestamp);
+                editor.putLong("alarmDateTime", save);
                 editor.apply();
+
                 // Test that correct date can be retrieved
                 SharedPreferences settings = getSharedPreferences(getSPName(this), MODE_PRIVATE);
                 SimpleDateFormat createDate = new SimpleDateFormat ("HH:mm, yyyy dd/MM");
-                timestamp = String.valueOf(settings.getString("alarmDateTime", ""));
-                alarmDateTime = originalFormat.parse(timestamp);
-                Toast.makeText(MainActivity.this, "Alarm time set to: "+alarmDateTime.toString(), Toast.LENGTH_SHORT).show();
+                alarmDateTime = new Date(settings.getLong("alarmDateTime", 0));
+                Toast.makeText(MainActivity.this, "Alarm time set to: "+createDate.format(alarmDateTime), Toast.LENGTH_SHORT).show();
+
                 checkSettings();
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -216,7 +247,7 @@ public class MainActivity extends AppCompatActivity  {
                 dest.setLongitude(Double.parseDouble(res[4]));
                 int distance = Math.round(userLocation.distanceTo(dest) / 1000); // distance in Km
                 if (distance <= maxDist){
-                    Resort resort = new Resort(Integer.parseInt(res[0]),res[1],res[2],dest);
+                    Resort resort = new Resort(Integer.parseInt(res[0]),res[1],res[2],res[5],dest);
                     resorts.add(resort);
                 }
             }
@@ -267,6 +298,12 @@ public class MainActivity extends AppCompatActivity  {
         protected void onPostExecute(ArrayList<Resort> result) {
             // Check snowfall and trigger alarm
             for(int i=0;i<result.size();i++){
+                if(result.get(i).getFormat().equals("cm")){
+
+                }
+                else if(result.get(i).getFormat().equals("inch")){
+
+                }
                 String snow = result.get(i).getSnow24h();
                 snow = snow.substring(0,snow.length()-2);
                 if(Integer.parseInt(snow) > minSnow){

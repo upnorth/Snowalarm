@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity  {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         Date today = new Date();
         long day = 86400000;
-        alarmDate = sdf.format(new Date((today.getTime()+day)));
+//        alarmDate = sdf.format(new Date((today.getTime()+day)));
+        alarmDate = sdf.format(new Date((today.getTime())));
         //getAlarmDate.setText(alarmDate);
         getAlarmTime.setText("0700");
 
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity  {
         return bestLocation;
     }
     public void onSetSnow(View view) {
-        if(getInt(getMinSnow) < 0){
+        if(getMinSnow == null || getInt(getMinSnow) < 0){
             Toast.makeText(MainActivity.this, "Are you kidding me!?", Toast.LENGTH_SHORT).show();
         }
         else {
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
     public void onSetDist(View view) {
-        if(getInt(getMaxDistance) < 0){
+        if(getMaxDistance == null || getInt(getMaxDistance) < 0){
             Toast.makeText(MainActivity.this, "Are you kidding me!?", Toast.LENGTH_SHORT).show();
         }
         else {
@@ -115,13 +116,12 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
     private Integer getInt(TextView text){
-        if(!text.getText().equals("")){
-
-            return Integer.parseInt(text.getText().toString());
-        }
-        else {
+        if(text.getText().equals("")){
             Toast.makeText(MainActivity.this, "Not a valid value, try again!", Toast.LENGTH_SHORT).show();
             return null;
+        }
+        else {
+            return Integer.parseInt(text.getText().toString());
         }
     }
     /*public void onSetDate(View view) {

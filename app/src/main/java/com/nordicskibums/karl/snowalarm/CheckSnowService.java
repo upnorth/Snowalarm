@@ -112,9 +112,9 @@ public class CheckSnowService extends IntentService {
             ArrayList<Resort> resorts = args[0];
             Document document;
             Elements elements;
-            final String updatedURL = "#snow_conditions > div.sr_module_header_grad > div.sr_module_header > div > ul:nth-child(1) > li.left > strong";
-            final String newSnowURL = "#conditions_content > div.content > ul:nth-child(2) > li._report_content > div > ul > li.today > div.station.top > div > div";
-            final String snowPackURL = "#conditions_content > div.content > div.snow_depth > ul:nth-child(1) > li.elevation.upper > div.white_pill.long";
+            final String updatedURL = "#snow_conditions > div > div > ul:nth-child(2) > li.left > strong";
+            final String newSnowURL = "#right_rail_modules1 > div:nth-child(1) > div > div > div > a:nth-child(2) > div > div:nth-child(1) > p.bluetxt.sfa";
+            final String snowPackURL = "#right_rail_modules1 > div:nth-child(1) > div > div > div > a:nth-child(2) > div > div:nth-child(1) > p.bluetxt.sd";
             try {
                 for(int i=0;i<resorts.size();i++){
                     document = Jsoup.connect(resorts.get(i).getUrl()).get();

@@ -19,10 +19,9 @@ public class MainActivity extends AppCompatActivity  {
     private TextView refreshPos;
     private TextView getMinSnow;
     private TextView getMaxDistance;
-    //private TextView getAlarmDate;
     private TextView getAlarmTime;
     private TextView setAlarm;
-    private TextView cancelAlarm;
+    private TextView testAlarm;
 
     Location userLocation;
 
@@ -30,7 +29,10 @@ public class MainActivity extends AppCompatActivity  {
     int maxDist = 0;
     String alarmDate = "";
     String alarmTime = "";
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     Date alarmDateTime = null;
+    final Date today = new Date();
+    final int day = 86400000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,17 +45,13 @@ public class MainActivity extends AppCompatActivity  {
         refreshPos = (TextView) findViewById(R.id.updatePosition); refreshPos.setEnabled(false);
         getMinSnow = (TextView) findViewById(R.id.editSnow);
         getMaxDistance = (TextView) findViewById(R.id.editDist);
-        //getAlarmDate = (TextView) findViewById(R.id.editDate);
         getAlarmTime = (TextView) findViewById(R.id.editTime);
         setAlarm = (TextView) findViewById(R.id.setAlarm); setAlarm.setEnabled(false);
-        cancelAlarm = (TextView) findViewById(R.id.cancelAlarm); cancelAlarm.setEnabled(false);
+        testAlarm = (TextView) findViewById(R.id.testAlarm); // testAlarm.setEnabled(false);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date today = new Date();
+        // Alarm is set to next day by default, can be changed to current day with "Test Alarm"
         long day = 86400000;
-//        alarmDate = sdf.format(new Date((today.getTime()+day)));
-        alarmDate = sdf.format(new Date((today.getTime())));
-        //getAlarmDate.setText(alarmDate);
+        alarmDate = sdf.format(new Date((today.getTime()+day)));
         getAlarmTime.setText("0700");
 
         // Get user position
@@ -124,15 +122,7 @@ public class MainActivity extends AppCompatActivity  {
             return Integer.parseInt(text.getText().toString());
         }
     }
-    /*public void onSetDate(View view) {
-        if(getAlarmDate.getText().length() == 8){
-            alarmDate = getAlarmDate.getText().toString();
-            setDate();
-        }
-        else{
-            Toast.makeText(MainActivity.this, "Not a valid time, try again!", Toast.LENGTH_SHORT).show();
-        }
-    }*/
+
     public void onSetTime(View view) {
         if(getAlarmTime.getText().length() == 4){
             alarmTime = getAlarmTime.getText().toString();
@@ -153,22 +143,7 @@ public class MainActivity extends AppCompatActivity  {
             Toast.makeText(MainActivity.this, "Not a valid time, try again!", Toast.LENGTH_SHORT).show();
         }
     }
-    /*private void setDate() {
-        if(alarmTime!=""){
-            try{
-                // Create datetime from input
-                SimpleDateFormat originalFormat = new SimpleDateFormat("yyyyMMddHHmm");
-                String timestamp = alarmDate+alarmTime;
-                alarmDateTime = originalFormat.parse(timestamp);
-                Settings.getInstance().setAlarmDateTime(alarmDateTime);
 
-                checkSettings();
-            } catch (ParseException e) {
-                e.printStackTrace();
-                Toast.makeText(MainActivity.this, "Wrong date or time format!\nExample: 20160205 and 0730 required.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
     public void checkSettings(){
         if(minSnow>-1 && maxDist>-1 && alarmDateTime!=null){
             setAlarm.setEnabled(true);
@@ -179,8 +154,13 @@ public class MainActivity extends AppCompatActivity  {
         // Save settings for findResorts() and CheckSnow
         Settings.getInstance().savePreferences(this);
         InitSnowCheck.setupAlarm(getApplicationContext());
+        Toast.makeText(MainActivity.this, "Snow check and hopefully alarm clock set to: "+alarmDate+", "+alarmTime, Toast.LENGTH_SHORT).show();
     }
-    public void onCancelAlarm(View view){
-        InitSnowCheck.cancelAlarm(getApplicationContext());
+    public void onTestAlarm(View view){
+        alarmDate = sdf.format(new Date(today.getTime()));
     }
+
+//    public void onCancelAlarm(View view){ // TODO: Implement active cancellation, current code cancels at app shutdown
+//        InitSnowCheck.cancelAlarm(getApplicationContext());
+//    }
 }

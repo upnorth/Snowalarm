@@ -7,7 +7,6 @@
     <string name="btnTime">Set alarm time (hhmm)</string>
     <string name="btnGPS">Update position</string>
     <string name="btnSet">Set Alarm</string>
-    <string name="btnCancel">Cancel Alarm</string>
-
+    <string name="btnTest">Optional: today (default is tomorrow)</string>
     <string name="defaultTime">0700</string>
 </resources>

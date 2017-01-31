@@ -59,30 +59,6 @@
         android:layout_toRightOf="@+id/editDist"
         android:layout_toEndOf="@+id/editDist" />
 
-    <!--EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="date"
-        android:ems="10"
-        android:id="@+id/editDate"
-        android:layout_alignBottom="@+id/setDate"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/setDate"
-        android:layout_toStartOf="@+id/setDate" /-->
-
-    <!--Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set date (yyyymmdd)"
-        android:onClick="onSetDate"
-        android:id="@+id/setDate"
-        android:layout_below="@+id/setDist"
-        android:layout_alignRight="@+id/setDist"
-        android:layout_alignEnd="@+id/setDist"
-        android:layout_alignLeft="@+id/setTime"
-        android:layout_alignStart="@+id/setTime" /-->
-
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -118,19 +94,21 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btnSet"
-        android:onClick="onSetAlarm"
-        android:id="@+id/setAlarm"
+        android:text="@string/btnTest"
+        android:onClick="onTestAlarm"
+        android:id="@+id/testAlarm"
         android:layout_below="@+id/updatePosition"
         android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btnCancel"
-        android:onClick="onCancelAlarm"
-        android:id="@+id/cancelAlarm"
-        android:layout_below="@+id/setAlarm"
+        android:text="@string/btnSet"
+        android:onClick="onSetAlarm"
+        android:id="@+id/setAlarm"
+        android:layout_below="@+id/testAlarm"
         android:layout_centerHorizontal="true" />
+
+
 
 </RelativeLayout>

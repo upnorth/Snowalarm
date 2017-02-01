@@ -26,11 +26,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AlarmNotification"
+            android:name=".SnowReport"
             android:label="@string/title_activity_notification"
             android:theme="@style/AppTheme.NoActionBar"/>
         <service
-            android:name=".CheckSnowService"
+            android:name=".SnowCheck"
             android:enabled="true"
             android:exported="false" />
 

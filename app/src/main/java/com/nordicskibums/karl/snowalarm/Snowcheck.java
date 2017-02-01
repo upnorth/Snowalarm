@@ -23,24 +23,24 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class CheckSnowService extends IntentService {
+public class SnowCheck extends IntentService {
 
     private static final int NOTIFICATION_ID = 1;
     private static final String ACTION_START = "ACTION_START";
     private static final String ACTION_DELETE = "ACTION_DELETE";
 
-    public CheckSnowService() {
-        super(CheckSnowService.class.getSimpleName());
+    public SnowCheck() {
+        super(SnowCheck.class.getSimpleName());
     }
 
     public static Intent createIntentStartNotificationService(Context context) {
-        Intent intent = new Intent(context, CheckSnowService.class);
+        Intent intent = new Intent(context, SnowCheck.class);
         intent.setAction(ACTION_START);
         return intent;
     }
 
     public static Intent createIntentDeleteNotification(Context context) {
-        Intent intent = new Intent(context, CheckSnowService.class);
+        Intent intent = new Intent(context, SnowCheck.class);
         intent.setAction(ACTION_DELETE);
         return intent;
     }
@@ -181,7 +181,7 @@ public class CheckSnowService extends IntentService {
                     .setContentText("Check out the latest snowfall!")
                     .setSmallIcon(R.drawable.notification_icon);
 
-            Intent mainIntent = new Intent(this, AlarmNotification.class);
+            Intent mainIntent = new Intent(this, SnowReport.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,
                     NOTIFICATION_ID,
                     mainIntent,

@@ -7,12 +7,12 @@ import android.location.LocationManager;
 
 import java.util.List;
 
-public class Position {
+public class UserPosition {
 
     public Location device;
     private Context context;
 
-    public Position(Context context) {
+    public UserPosition(Context context) {
         this.context = context;
         LocationManager locationManager = (android.location.LocationManager)
                 context.getSystemService(Context.LOCATION_SERVICE);

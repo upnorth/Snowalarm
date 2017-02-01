@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity  {
         getAlarmTime.setText("0700");
 
         // Get user position
-        Position pos = new Position(this);
+        UserPosition pos = new UserPosition(this);
         userLocation = pos.device;
         Settings.getInstance().setUserLocation(userLocation);
         if(userLocation == null){
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity  {
         return bestLocation;
     }
     public void onSetSnow(View view) {
-        if(getMinSnow == null || getInt(getMinSnow) < 0){
+        if(isEmpty(getMinSnow) || getInt(getMinSnow) < 0){
             Toast.makeText(MainActivity.this, "Are you kidding me!?", Toast.LENGTH_SHORT).show();
         }
         else {
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
     public void onSetDist(View view) {
-        if(getMaxDistance == null || getInt(getMaxDistance) < 0){
+        if(isEmpty(getMaxDistance) || getInt(getMaxDistance) < 0 || getInt(getMaxDistance) > 2147483647){
             Toast.makeText(MainActivity.this, "Are you kidding me!?", Toast.LENGTH_SHORT).show();
         }
         else {
@@ -113,18 +113,25 @@ public class MainActivity extends AppCompatActivity  {
             checkSettings();
         }
     }
-    private Integer getInt(TextView text){
-        if(text.getText().equals("")){
-            Toast.makeText(MainActivity.this, "Not a valid value, try again!", Toast.LENGTH_SHORT).show();
+    private boolean isEmpty(TextView etText) {
+        if (etText.getText().toString().trim().length() > 0)
+            return false;
+        return true;
+    }
+    public Integer getInt(TextView text) { //TODO: Fiks parsInt
+        try {
+            return Integer.parseInt(text.getText().toString());
+        } catch (NumberFormatException e) {
+            Toast.makeText(MainActivity.this, "Not a valid number, try again!", Toast.LENGTH_SHORT).show();
             return null;
         }
-        else {
-            return Integer.parseInt(text.getText().toString());
-        }
     }
+//    private Integer getInt(TextView text){
+//            return Integer.parseInt(text.getText().toString());
+//    }
 
     public void onSetTime(View view) {
-        if(getAlarmTime.getText().length() == 4){
+        if(getAlarmTime.getText().length() == 4 && getInt(getAlarmTime) >=0 && getInt(getAlarmTime) <= 2359){
             alarmTime = getAlarmTime.getText().toString();
             //setDate();
             // Create datetime from input
@@ -135,6 +142,16 @@ public class MainActivity extends AppCompatActivity  {
                 Settings.getInstance().setAlarmDateTime(alarmDateTime);
             } catch (ParseException e) {
                 e.printStackTrace();
+//                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create(); // TODO: Implement dialog instead of toast for some messages
+//                alertDialog.setTitle("Heads up!");
+//                alertDialog.setMessage("Wrong date or time format!\nExample: 20160205 and 0730 required.");
+//                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+//                        new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                dialog.dismiss();
+//                            }
+//                        });
+//                alertDialog.show();
                 Toast.makeText(MainActivity.this, "Wrong date or time format!\nExample: 20160205 and 0730 required.", Toast.LENGTH_SHORT).show();
             }
             checkSettings();

@@ -24,6 +24,7 @@ public class Resort {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    // Currently only static urls available in resorts.csv
     public String getUrl() { return url; }
     public void setUrl(String url) { this.url = url; }
 
@@ -39,6 +40,7 @@ public class Resort {
     public String getSnowPack() { return snowPack; }
     public void setSnowPack(String snowPack) { this.snowPack = snowPack; }
 
+    // For possible future use of both cm and inches
     public String getFormat() { return format; }
     public void setFormat(String format) { this.format = format; }
 }

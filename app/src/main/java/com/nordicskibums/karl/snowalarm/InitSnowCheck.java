@@ -13,15 +13,11 @@ public class InitSnowCheck extends WakefulBroadcastReceiver {
     private static final String ACTION_DELETE_NOTIFICATION = "ACTION_DELETE_NOTIFICATION";
 
     public static void setupAlarm(Context context) {
-
-        //Create alarm manager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-        //Create pending intent & register it to your alarm notifier class
         Intent intent = new Intent(context, InitSnowCheck.class);
         PendingIntent alarmIntent = getStartPendingIntent(context);
 
-        //set that timer as a RTC Wakeup to alarm manager object
+        // Setting user input for time and date to trigger snow check and possible alarm clock
         alarmManager.set(AlarmManager.RTC_WAKEUP, Settings.getInstance().getAlarmDateTime().getTime(), alarmIntent);
 
     }
@@ -29,6 +25,7 @@ public class InitSnowCheck extends WakefulBroadcastReceiver {
         return context.getPackageName() + "_preferences";
     }
 
+    // TODO: Complete implementation
     public static void cancelAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent alarmIntent = getStartPendingIntent(context);
@@ -53,10 +50,10 @@ public class InitSnowCheck extends WakefulBroadcastReceiver {
         Intent serviceIntent = null;
         if (ACTION_START_NOTIFICATION_SERVICE.equals(action)) {
             Log.i(getClass().getSimpleName(), "onReceive from alarm, starting notification service");
-            serviceIntent = CheckSnowService.createIntentStartNotificationService(context);
+            serviceIntent = SnowCheck.createIntentStartNotificationService(context);
         } else if (ACTION_DELETE_NOTIFICATION.equals(action)) {
             Log.i(getClass().getSimpleName(), "onReceive delete notification action, starting notification service to handle delete");
-            serviceIntent = CheckSnowService.createIntentDeleteNotification(context);
+            serviceIntent = SnowCheck.createIntentDeleteNotification(context);
         }
 
         if (serviceIntent != null) {

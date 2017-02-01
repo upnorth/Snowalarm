@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity  {
             return false;
         return true;
     }
-    public Integer getInt(TextView text) { //TODO: Fiks parsInt
+    public Integer getInt(TextView text) { //TODO: Fiks parsInt ved store tall fra input
         try {
             return Integer.parseInt(text.getText().toString());
         } catch (NumberFormatException e) {

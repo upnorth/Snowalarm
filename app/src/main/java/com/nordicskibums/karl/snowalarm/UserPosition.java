@@ -5,8 +5,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 
-import java.util.List;
-
 public class UserPosition {
 
     public Location device;

@@ -88,7 +88,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/btnGPS"
-        android:onClick="onRefreshGPS"
+        android:onClick="onUpdateGPS"
         android:id="@+id/updatePosition"
         android:layout_below="@+id/editTime"
         android:layout_alignRight="@+id/setTime"

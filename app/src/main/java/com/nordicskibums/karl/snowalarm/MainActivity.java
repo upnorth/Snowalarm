@@ -1,11 +1,12 @@
 package com.nordicskibums.karl.snowalarm;
 
+import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,70 +17,64 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity  {
 
-    private TextView refreshPos;
+    private TextView updatePosition;
     private TextView getMinSnow;
     private TextView getMaxDistance;
     private TextView getAlarmTime;
-    private TextView setAlarm;
-    private TextView testAlarm;
+    private TextView saveSettings;
 
-    Location userLocation;
+    private Location userLocation;
 
-    int minSnow = 0;
-    int maxDist = 0;
-    String alarmDate = "";
-    String alarmTime = "";
-    final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-    Date alarmDateTime = null;
-    final Date today = new Date();
-    final int day = 86400000;
+    private String alarmTime = "";
+    private String alarmDate = "";
+    private final Date today = new Date();
+    private final SimpleDateFormat alarmDateFormat = new SimpleDateFormat("yyyyMMdd");
+    private Date alarmDateTime = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle("Snow alarm settings:");
 
-        refreshPos = (TextView) findViewById(R.id.updatePosition); refreshPos.setEnabled(false);
+        // Connecting to user interface
+        updatePosition = (TextView) findViewById(R.id.updatePosition); updatePosition.setEnabled(false);
         getMinSnow = (TextView) findViewById(R.id.editSnow);
         getMaxDistance = (TextView) findViewById(R.id.editDist);
         getAlarmTime = (TextView) findViewById(R.id.editTime);
-        setAlarm = (TextView) findViewById(R.id.setAlarm); setAlarm.setEnabled(false);
-        testAlarm = (TextView) findViewById(R.id.testAlarm); // testAlarm.setEnabled(false);
+        saveSettings = (TextView) findViewById(R.id.setAlarm); saveSettings.setEnabled(false);
 
         // Alarm is set to next day by default, can be changed to current day with "Test Alarm"
         long day = 86400000;
-        alarmDate = sdf.format(new Date((today.getTime()+day)));
-        getAlarmTime.setText("0700");
+        alarmDate = alarmDateFormat.format(new Date((today.getTime()+day)));
 
         // Get user position
         UserPosition pos = new UserPosition(this);
         userLocation = pos.device;
         Settings.getInstance().setUserLocation(userLocation);
-        if(userLocation == null){
+        if(userLocation == null){ // TODO: Clean up logic
             userLocation = getLastKnownLocation();
             Settings.getInstance().setUserLocation(userLocation);
             if(userLocation == null){
-                Toast.makeText(MainActivity.this, "Your location can´t be found. Please activate GPS and update your position.", Toast.LENGTH_SHORT).show();
-                refreshPos.setEnabled(true);
+                updatePosition.setEnabled(true);
+                alert("gps");
             }
         }
+
+        // Load resort data
         Settings.getInstance().setAllResortsCSV(this.getResources().openRawResource(R.raw.resorts));
     }
-    public void onRefreshGPS(View view) {
+    public void onUpdateGPS(View view) {
         userLocation = getLastKnownLocation();
         if(userLocation == null){
             Toast.makeText(MainActivity.this, "No position found yet...", Toast.LENGTH_SHORT).show();
         }
         else {
-            Toast.makeText(MainActivity.this, "Got it!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Found you!", Toast.LENGTH_SHORT).show();
             Settings.getInstance().setUserLocation(userLocation);
-            refreshPos.setEnabled(false);
+            updatePosition.setEnabled(false);
         }
     }
-    private Location getLastKnownLocation() {
+    private Location getLastKnownLocation() { // TODO: Integrate into UserPosition
         LocationManager mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
         Location bestLocation = null;
@@ -97,7 +92,7 @@ public class MainActivity extends AppCompatActivity  {
     }
     public void onSetSnow(View view) {
         if(isEmpty(getMinSnow) || getInt(getMinSnow) < 0){
-            Toast.makeText(MainActivity.this, "Are you kidding me!?", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "That´s not gonna work...", Toast.LENGTH_SHORT).show();
         }
         else {
             Settings.getInstance().setMinSnow(getInt(getMinSnow));
@@ -106,7 +101,7 @@ public class MainActivity extends AppCompatActivity  {
     }
     public void onSetDist(View view) {
         if(isEmpty(getMaxDistance) || getInt(getMaxDistance) < 0 || getInt(getMaxDistance) > 2147483647){
-            Toast.makeText(MainActivity.this, "Are you kidding me!?", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "That´s not gonna work...", Toast.LENGTH_SHORT).show();
         }
         else {
             Settings.getInstance().setMaxDist(getInt(getMaxDistance));
@@ -118,11 +113,11 @@ public class MainActivity extends AppCompatActivity  {
             return false;
         return true;
     }
-    public Integer getInt(TextView text) { //TODO: Fiks parsInt ved store tall fra input
+    public Integer getInt(TextView text) { //TODO: Fix validation of input for big numbers to avoid crashes
         try {
             return Integer.parseInt(text.getText().toString());
         } catch (NumberFormatException e) {
-            Toast.makeText(MainActivity.this, "Not a valid number, try again!", Toast.LENGTH_SHORT).show();
+            alert("unvalid");
             return null;
         }
     }
@@ -130,7 +125,7 @@ public class MainActivity extends AppCompatActivity  {
 //            return Integer.parseInt(text.getText().toString());
 //    }
 
-    public void onSetTime(View view) {
+    public void onSetTime(View view) { // TODO: Clean up validation with a Time Picker
         if(getAlarmTime.getText().length() == 4 && getInt(getAlarmTime) >=0 && getInt(getAlarmTime) <= 2359){
             alarmTime = getAlarmTime.getText().toString();
             //setDate();
@@ -142,28 +137,18 @@ public class MainActivity extends AppCompatActivity  {
                 Settings.getInstance().setAlarmDateTime(alarmDateTime);
             } catch (ParseException e) {
                 e.printStackTrace();
-//                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create(); // TODO: Implement dialog instead of toast for some messages
-//                alertDialog.setTitle("Heads up!");
-//                alertDialog.setMessage("Wrong date or time format!\nExample: 20160205 and 0730 required.");
-//                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-//                        new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                dialog.dismiss();
-//                            }
-//                        });
-//                alertDialog.show();
-                Toast.makeText(MainActivity.this, "Wrong date or time format!\nExample: 20160205 and 0730 required.", Toast.LENGTH_SHORT).show();
+                alert("badDateTime");
             }
             checkSettings();
         }
         else{
-            Toast.makeText(MainActivity.this, "Not a valid time, try again!", Toast.LENGTH_SHORT).show();
+            alert("badDateTime");
         }
     }
 
-    public void checkSettings(){
-        if(minSnow>-1 && maxDist>-1 && alarmDateTime!=null){
-            setAlarm.setEnabled(true);
+    public void checkSettings(){ // Check if user has given all essential input to set the alarm
+        if(Settings.getInstance().getMinSnow()>-1 && Settings.getInstance().getMaxDist()>-1 && alarmDateTime!=null){
+            saveSettings.setEnabled(true);
         }
     }
 
@@ -171,13 +156,53 @@ public class MainActivity extends AppCompatActivity  {
         // Save settings for findResorts() and CheckSnow
         Settings.getInstance().savePreferences(this);
         InitSnowCheck.setupAlarm(getApplicationContext());
-        Toast.makeText(MainActivity.this, "Snow check and hopefully alarm clock set to: "+alarmDate+", "+alarmTime, Toast.LENGTH_SHORT).show();
-    }
-    public void onTestAlarm(View view){
-        alarmDate = sdf.format(new Date(today.getTime()));
+        alert("alarmSet");
     }
 
-//    public void onCancelAlarm(View view){ // TODO: Implement active cancellation, current code cancels at app shutdown
+    public void onTestAlarm(View view){
+        alarmDate = alarmDateFormat.format(new Date(today.getTime()));
+    }
+
+    public void alert(String type){ // TODO: Extract into separate class file
+        String title = "";
+        String message = "";
+        String button = "";
+        switch (type){
+            case "gps":
+                title = "Your location can´t be found!";
+                message = "Please activate GPS and update your position.";
+                button = "Ok.";
+                break;
+            case "badDateTime":
+                title = "Wrong date or time format!";
+                message = "Example: '20170205' and '0730' works.";
+                button = "Ok.";
+                break;
+            case "unvalid":
+                title = "Not a valid number";
+                message = "Try again!";
+                button = "Ok.";
+                break;
+            case "alarmSet":
+                title = "Time to relax!";
+                message = "I´ll tell you at "+alarmTime+" ("+alarmDate+")\nif it´s worth heading out.";
+                button = "Cool, see you later.";
+                break;
+            default:
+                break;
+        }
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, button,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
+//    public void onCancelAlarm(View view){ // TODO: Change to jobScheduler and implement active cancellation, current code cancels at app shutdown
 //        InitSnowCheck.cancelAlarm(getApplicationContext());
 //    }
 }

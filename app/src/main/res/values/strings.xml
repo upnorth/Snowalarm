@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Snow alarm</string>
-    <string name="title_activity_main">Snow alarm</string>
-    <string name="title_activity_notification">NotificationActivity</string>
+    <string name="title_activity_main">Snow alarm: settings</string>
+    <string name="title_activity_notification">Snow alarm: report</string>
     <string name="btnSnow">Set min snowfall (cm)</string>
     <string name="btnDist">Set max distance (km)</string>
     <string name="btnTime">Set alarm time (hhmm)</string>
     <string name="btnGPS">Update position</string>
-    <string name="btnSet">Set Alarm</string>
+    <string name="btnSet">Save</string>
     <string name="btnTest">Optional: today (default is tomorrow)</string>
     <string name="defaultTime">0700</string>
 </resources>
